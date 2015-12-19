@@ -9,11 +9,10 @@ module.exports = {
     get: function (req, res) {}, // a function which handles a get request for all messages
     post: function (req, res) {
       var username = req.body.username;
-      var queryString = "SELECT id FROM users WHERE name = " + username;
       var message = req.body.message;
       var roomname = req.body.roomname;
-      var dataArray = [queryString,message, roomname];
-      dbConnection.query('INSERT INTO messages (userid, text, Roomname) VALUES (?,  ?,  ?)', dataArray , function(err, result){
+      var dataArray = [username ,message, roomname];
+      dbConnection.query('INSERT INTO messages (userid, text, Roomname) VALUES (SELECT id FROM users WHERE name=?,  ?,  ?)', dataArray , function(err, result){
         if (err) throw err;
         console.log(result);
         res.writeHead(201, 'created');
@@ -29,7 +28,7 @@ module.exports = {
       var value = req.body.username;
       dbConnection.query('INSERT INTO users (name) VALUES (?)',value , function(err, result){
         if (err) throw err;
-        console.log(result);
+     
         res.writeHead(201, 'created');
         res.end();
       });
