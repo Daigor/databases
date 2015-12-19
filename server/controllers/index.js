@@ -6,18 +6,32 @@ var mysql = require('mysql');
 
 module.exports = {
   messages: {
-    get: function (req, res) {}, // a function which handles a get request for all messages
+    get: function (req, res) {
+      console.log('2nd test');
+      dbConnection.query('SELECT * FROM messages', function(err,result){
+        if (err) throw err;
+        console.log(result);
+        res.writeHead(200, 'Succesful');
+        res.end(JSON.stringify(result));
+      });
+
+    }, // a function which handles a get request for all messages
+
     post: function (req, res) {
       var username = req.body.username;
       var message = req.body.message;
       var roomname = req.body.roomname;
-      var dataArray = [username ,message, roomname];
-      dbConnection.query('INSERT INTO messages (userid, text, Roomname) VALUES (SELECT id FROM users WHERE name=?,  ?,  ?)', dataArray , function(err, result){
+      dbConnection.query('SELECT id FROM users WHERE name = ?', username, function(err,result){
         if (err) throw err;
-        console.log(result);
-        res.writeHead(201, 'created');
-        res.end();
+        var dataArray = [result[0].id ,message, roomname];
+        dbConnection.query('INSERT INTO messages (userid, text, Roomname) VALUES (?,  ?,  ?)', dataArray , function(err, result){
+          if (err) throw err;
+          
+          res.writeHead(201, 'created');
+          res.end();
+        });      
       });
+     
     } // a function which handles posting a message to the database
   },
 
